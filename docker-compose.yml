@@ -44,10 +44,22 @@ services:
       context: ./backend
     env_file:
       - .env
-    command: celery -A config worker --loglevel=info
+    command: celery -A config worker -Q default --loglevel=info # -c 4  : each worker can reserved
     depends_on:
       - backend
       - redis
+
+
+  cpu-worker:
+    build: 
+      context: ./backend
+    env_file:
+      - .env
+    command: celery -A config worker -Q cpu_heavy -c 1 --prefetch-multiplier=1
+    depends_on:
+      - backend
+      - redis
+
 
   redis:
     image: redis:7
@@ -58,7 +70,6 @@ services:
       - "6379:6379"
     # expose:
     #   - 6379
-
 
 
 volumes:

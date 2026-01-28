@@ -1,16 +1,19 @@
 import random
 from celery import shared_task
 
+from orders.services.cpu_processing import run_cpu_heavy_job
 from orders.services.order_service import (
-    start_processing,
-    complete_order,
-    fail_order,
-)
+                                                start_processing,
+                                                complete_order,
+                                                fail_order,
+                                            )
 from orders.services.exceptions import InvalidOrderState, OrderNotFound
 
 
 FAIL_RATE = 0.2
 PROCESSING_DELAY = 5  # seconds
+
+
 
 
 @shared_task(bind=True)
@@ -22,16 +25,20 @@ def process_order_task(self, order_id: str):
 
         finalize_order_task.apply_async(
             args=[order_id, should_fail],
-            countdown=PROCESSING_DELAY,
+            queue="cpu_heavy",
         )
 
     except (InvalidOrderState, OrderNotFound):
         raise
 
 
-@shared_task(bind=True)
+@shared_task(bind=True, max_retries=0, queue="cpu_heavy")
 def finalize_order_task(self, order_id: str, should_fail: bool):
+    
     try:
+        
+        run_cpu_heavy_job(order_id)
+
         if should_fail:
             fail_order(
                 order_id=order_id,

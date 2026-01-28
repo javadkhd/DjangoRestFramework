@@ -101,7 +101,10 @@ def fail_order(*, order_id, reason=None) -> Order:
 
     order.status = Order.Status.FAILED
     if reason:
-        order.metadata = dict({**order.metadata, "failure_reason": reason})
+        if order.metadata:
+            order.metadata.update({"failure_reason": reason})
+        else:
+            order.metadata = {"failure_reason": reason}
 
     order.save(update_fields=["status", "metadata", "updated_at"])
 
