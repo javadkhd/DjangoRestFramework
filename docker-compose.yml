@@ -1,0 +1,67 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4
+    volumes:
+      - static_volume:/app/backend/staticfiles
+      - ./backend:/app/backend
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8000:8000"
+    # expose:
+    #   - 8000
+
+
+  nginx:
+    build:
+      context: ./docker/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - static_volume:/app/backend/staticfiles
+    depends_on:
+      - backend
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    # expose:
+    #   - 5432
+
+  worker:
+    build:
+      context: ./backend
+    env_file:
+      - .env
+    command: celery -A config worker --loglevel=info
+    depends_on:
+      - backend
+      - redis
+
+  redis:
+    image: redis:7
+    container_name: redis
+    env_file:
+      - .env
+    ports:
+      - "6379:6379"
+    # expose:
+    #   - 6379
+
+
+
+volumes:
+  postgres_data:
+  static_volume:
+

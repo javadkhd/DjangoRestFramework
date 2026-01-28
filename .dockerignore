@@ -1,0 +1,56 @@
+# Git and VCS
+.git
+.gitignore
+.gitattributes
+.gitmodules
+
+# Environment & configs
+.env
+.env.*
+*.example
+*.local
+
+# Python cache and build files
+pycache
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+*.log
+*.sqlite3
+build/
+dist/
+*.egg
+*.whl
+
+# Node / React build artifacts
+node_modules
+build
+dist
+.cache
+coverage
+
+# System / IDE
+.vscode
+.idea
+*.iml
+.DS_Store
+Thumbs.db
+
+# Docs and tests
+tests
+*.md
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+*.pid
+*.swp
+*.tmp
+*.bak
+*.tar
+
+# Media and static files (collected separately)
+media
+staticfiles
+static
