@@ -25,10 +25,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('orders.api.urls')),
     path('health/', include('common.urls')),
+    path("api/auth/", include("accounts.api.urls")),
     
     
-    path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain"),
-    path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
 
 
