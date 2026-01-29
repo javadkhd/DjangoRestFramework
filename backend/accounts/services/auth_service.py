@@ -29,3 +29,15 @@ def logout_user(*, refresh_token: str) -> None:
         pass
 
 
+def change_password(*, user, old_password: str, new_password: str):
+    if not user.check_password(old_password):
+        raise ValueError("Old password is incorrect")
+    user.set_password(new_password)
+    user.save()
+
+
+def update_profile(*, user, username: str, email: str):
+    user.username = username
+    user.email = email
+    user.save()
+    return user
