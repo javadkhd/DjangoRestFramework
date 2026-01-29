@@ -11,3 +11,21 @@ def register_user(*, username: str, email: str, password: str) -> User:
         is_active=True,  # TODO use email verification, set to False initially
     )
     return user
+
+
+
+
+
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
+
+
+def logout_user(*, refresh_token: str) -> None:
+    try:
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+    except TokenError:
+        # token invalid / expired / already blacklisted
+        pass
+
+

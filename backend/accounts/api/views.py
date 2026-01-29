@@ -11,8 +11,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from accounts.api.serializers import RegisterSerializer
-from accounts.services.auth_service import register_user
+from accounts.api.serializers import RegisterSerializer, LogoutSerializer
+from accounts.services.auth_service import register_user, logout_user
+from rest_framework.permissions import IsAuthenticated
+
+
+
 
 
 class RegisterView(APIView):
@@ -30,3 +34,17 @@ class RegisterView(APIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+
+
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = LogoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        logout_user(refresh_token=serializer.validated_data["refresh"])
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
