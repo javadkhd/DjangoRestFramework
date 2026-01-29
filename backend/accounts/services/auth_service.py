@@ -1,3 +1,8 @@
+
+
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
+
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -13,11 +18,6 @@ def register_user(*, username: str, email: str, password: str) -> User:
     return user
 
 
-
-
-
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import TokenError
 
 
 def logout_user(*, refresh_token: str) -> None:

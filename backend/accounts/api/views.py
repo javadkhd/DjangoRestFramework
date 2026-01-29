@@ -1,17 +1,12 @@
 # Import here to use in URL routing
-from rest_framework_simplejwt.views import (
-                                            TokenObtainPairView,
-                                            TokenRefreshView,
-                                        )
-
-
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from accounts.api.serializers import RegisterSerializer, LogoutSerializer
+from accounts.api.serializers import RegisterSerializer, LogoutSerializer, CurrentUserSerializer
 from accounts.services.auth_service import register_user, logout_user
 from rest_framework.permissions import IsAuthenticated
 
@@ -48,3 +43,26 @@ class LogoutView(APIView):
         logout_user(refresh_token=serializer.validated_data["refresh"])
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = CurrentUserSerializer(request.user)
+        return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+

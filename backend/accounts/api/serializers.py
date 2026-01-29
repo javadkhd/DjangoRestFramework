@@ -23,8 +23,17 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 
-from rest_framework import serializers
-
 
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
+
+
+
+class CurrentUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "email")
+
+
+
+
