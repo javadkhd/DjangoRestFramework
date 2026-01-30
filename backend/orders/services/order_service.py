@@ -3,10 +3,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from orders.models import Order
-from orders.services.exceptions import (
-    OrderNotFound,
-    InvalidOrderState,
-)
+from orders.services.exceptions import OrderNotFound, InvalidOrderState
 
 
 User = get_user_model()
@@ -28,6 +25,14 @@ def create_order(*, user: User, amount: int) -> Order:
 def get_order(*, order_id):
     try:
         return Order.objects.get(id=order_id)
+    except Order.DoesNotExist:
+        raise OrderNotFound
+
+
+
+def filter_order(*, user):
+    try:
+        return Order.objects.filter(user=user)
     except Order.DoesNotExist:
         raise OrderNotFound
 
@@ -130,5 +135,5 @@ def cancel_order(*, order_id):
         raise InvalidOrderState(f"Order cannot be canceled while in '{order.status}' state.")
     
     order.status = Order.Status.CANCELED
-    order.save(update_fields=['status', 'update_at'])
+    order.save(update_fields=['status', 'updated_at'])
     return order

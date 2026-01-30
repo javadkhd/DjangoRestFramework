@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import permissions
 
 from accounts.api.serializers import RegisterSerializer, LogoutSerializer, CurrentUserSerializer, \
     ChangePasswordSerializer, UpdateProfileSerializer
@@ -17,13 +18,8 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class RegisterView(APIView):
-    def get(self, request):
-        return Response(
-            {
-                "message": "It just work for POST method.",
-            },
-                status=status.HTTP_405_METHOD_NOT_ALLOWED,
-        )
+    permission_classes = [permissions.AllowAny]
+        
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

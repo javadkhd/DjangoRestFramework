@@ -44,7 +44,7 @@ services:
       context: ./backend
     env_file:
       - .env
-    command: celery -A config worker -Q default --loglevel=info # -c 4  : each worker can reserved
+    command: celery -A config worker --loglevel=info # -c 4  : each worker can reserved
     depends_on:
       - backend
       - redis
