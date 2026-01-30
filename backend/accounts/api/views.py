@@ -17,6 +17,13 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class RegisterView(APIView):
+    def get(self, request):
+        return Response(
+            {
+                "message": "It just work for POST method.",
+            },
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

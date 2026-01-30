@@ -2,8 +2,8 @@ from django.urls import path
 
 
 
-from accounts.api.views import RegisterView, TokenObtainPairView, \
-    TokenRefreshView, LogoutView, CurrentUserView, \
+from accounts.api.views import TokenObtainPairView, TokenRefreshView, \
+    RegisterView, LogoutView, CurrentUserView, \
     ChangePasswordView, UpdateProfileView
 
 app_name = "accounts"
