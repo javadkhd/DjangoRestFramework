@@ -3,6 +3,12 @@ from django.contrib.auth import get_user_model
 
 from django.contrib.auth.password_validation import validate_password
 
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.exceptions import AuthenticationFailed
+
+
+
 User = get_user_model()
 
 
@@ -70,3 +76,15 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         if User.objects.exclude(pk=user.pk).filter(username=value).exists():
             raise serializers.ValidationError("Username already exists")
         return value
+
+
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        if not self.user.is_active:
+            raise AuthenticationFailed("Email is not verified")
+
+        return data

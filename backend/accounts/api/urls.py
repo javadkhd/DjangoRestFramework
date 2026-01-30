@@ -2,18 +2,20 @@ from django.urls import path
 
 
 
-from accounts.api.views import TokenObtainPairView, TokenRefreshView, \
-    RegisterView, LogoutView, CurrentUserView, \
-    ChangePasswordView, UpdateProfileView
+from accounts.api.views import RegisterView, VerifyEmailView, LoginView, RefreshTokenView, \
+    LogoutView, ChangePasswordView, UpdateProfileView, CurrentUserView
 
 app_name = "accounts"
 
 urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),
-    path("logout/", LogoutView.as_view(), name="logout"),
-    path("me/", CurrentUserView.as_view(), name="current_user"),
+    path("verify-email/", VerifyEmailView.as_view(), name="verify_email"),
     path("change-password/", ChangePasswordView.as_view(), name="change_password"),
+    
+    path("logout/", LogoutView.as_view(), name="logout"),
+    path("token/", LoginView.as_view(), name="token_obtain"),
+    path("token/refresh/", RefreshTokenView.as_view(), name="token_refresh"),
+    
     path("update-profile/", UpdateProfileView.as_view(), name="update_profile"),
-    path("token/", TokenObtainPairView.as_view(), name="token_obtain"), # LogIn
-    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("me/", CurrentUserView.as_view(), name="current_user"),
 ]
