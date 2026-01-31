@@ -111,14 +111,35 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
 
 
 
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.exceptions import AuthenticationFailed
+from accounts.tokens import LoginToken
+
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+
     def validate(self, attrs):
         data = super().validate(attrs)
 
         if not self.user.is_active:
             raise AuthenticationFailed("Email is not verified")
 
+        # replace default access token
+        access = LoginToken.for_user(self.user)
+
+        data["access"] = str(access)
+
         return data
+
+# class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+#     def validate(self, attrs):
+#         data = super().validate(attrs)
+
+#         if not self.user.is_active:
+#             raise AuthenticationFailed("Email is not verified")
+
+#         return data
 
 
 

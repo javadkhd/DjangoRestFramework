@@ -19,7 +19,6 @@ def register_user(*, username: str, email: str, password: str) -> User:
 
 
 
-
 def logout_user(*, refresh_token: str) -> None:
     try:
         token = RefreshToken(refresh_token)
