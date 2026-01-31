@@ -7,31 +7,55 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.exceptions import AuthenticationFailed
 
-
+from accounts.models import Profile
 
 User = get_user_model()
 
-
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ("username", "email", "password")
+        fields = ("email", "password")
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("Email already exists")
         return value
 
-    def validate_username(self, value):
-        if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("Username already exists")
-        return value
-
     def validate_password(self, value):
         validate_password(value)
         return value
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data["email"],
+            email=validated_data["email"],
+            password=validated_data["password"],
+            is_active=False,
+        )
+        return user
+
+# class RegisterSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(write_only=True, min_length=8)
+
+#     class Meta:
+#         model = User
+#         fields = ("username", "email", "password")
+
+#     def validate_email(self, value):
+#         if User.objects.filter(email=value).exists():
+#             raise serializers.ValidationError("Email already exists")
+#         return value
+
+#     def validate_username(self, value):
+#         if User.objects.filter(username=value).exists():
+#             raise serializers.ValidationError("Username already exists")
+#         return value
+
+#     def validate_password(self, value):
+#         validate_password(value)
+#         return value
 
 
 
@@ -60,22 +84,29 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 
+
 class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ("username", "email")
+        model = Profile
+        fields = ("first_name", "last_name", "phone")
 
-    def validate_email(self, value):
-        user = self.context["request"].user
-        if User.objects.exclude(pk=user.pk).filter(email=value).exists():
-            raise serializers.ValidationError("Email already exists")
-        return value
 
-    def validate_username(self, value):
-        user = self.context["request"].user
-        if User.objects.exclude(pk=user.pk).filter(username=value).exists():
-            raise serializers.ValidationError("Username already exists")
-        return value
+# class UpdateProfileSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ("username", "email")
+
+#     def validate_email(self, value):
+#         user = self.context["request"].user
+#         if User.objects.exclude(pk=user.pk).filter(email=value).exists():
+#             raise serializers.ValidationError("Email already exists")
+#         return value
+
+#     def validate_username(self, value):
+#         user = self.context["request"].user
+#         if User.objects.exclude(pk=user.pk).filter(username=value).exists():
+#             raise serializers.ValidationError("Username already exists")
+#         return value
 
 
 

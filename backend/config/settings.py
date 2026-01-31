@@ -33,7 +33,8 @@ ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='').split(',')
 # Application definition
 
 INSTALLED_APPS = [
-    'accounts',
+    # 'accounts',
+    "accounts.apps.AccountsConfig", 
     
     'django.contrib.admin',
     'django.contrib.auth',

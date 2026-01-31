@@ -5,19 +5,19 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import permissions
 
 from accounts.api.serializers import RegisterSerializer, LogoutSerializer, CurrentUserSerializer, \
     ChangePasswordSerializer, UpdateProfileSerializer, CustomTokenObtainPairSerializer, \
     ResetPasswordRequestSerializer, ResetPasswordConfirmSerializer
     
 from accounts.services.auth_service import register_user, logout_user, change_password, update_profile
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
 from rest_framework_simplejwt.tokens import UntypedToken
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError, ValidationError
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.contrib.auth import get_user_model
+from rest_framework.exceptions import ValidationError
 
 
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -33,7 +33,7 @@ from accounts.tokens import PasswordResetToken
 
 
 class RegisterView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -96,7 +96,8 @@ class VerifyEmailView(APIView):
                 )
 
             user.is_active = True
-            user.save(update_fields=["is_active"])
+            user.email_verified = True
+            user.save(update_fields=["is_active", "email_verified"])
 
             return Response(
                 {"detail": "Email verified successfully"},
@@ -125,13 +126,15 @@ class RefreshTokenView(TokenRefreshView):
 
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = LogoutSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        logout_user(refresh_token=serializer.validated_data["refresh"])
+        try:
+            logout_user(refresh_token=serializer.validated_data["refresh"])
+        except:
+            pass
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -146,25 +149,38 @@ class CurrentUserView(APIView):
         return Response(serializer.data)
 
 
-
-
 class UpdateProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def patch(self, request):
-        serializer = UpdateProfileSerializer(instance=request.user, data=request.data, partial=True, context={"request": request})
-        serializer.is_valid(raise_exception=True)
-
-        user = update_profile(
-            user=request.user,
-            username=serializer.validated_data.get("username", request.user.username),
-            email=serializer.validated_data.get("email", request.user.email),
+        serializer = UpdateProfileSerializer(
+            instance=request.user.profile,
+            data=request.data,
+            partial=True,
         )
-        return Response({
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-        })
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
+
+
+# class UpdateProfileView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def patch(self, request):
+#         serializer = UpdateProfileSerializer(instance=request.user, data=request.data, partial=True, context={"request": request})
+#         serializer.is_valid(raise_exception=True)
+
+#         user = update_profile(
+#             user=request.user,
+#             username=serializer.validated_data.get("username", request.user.username),
+#             email=serializer.validated_data.get("email", request.user.email),
+#         )
+#         return Response({
+#             "id": user.id,
+#             "username": user.username,
+#             "email": user.email,
+#         })
 
 
 

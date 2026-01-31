@@ -13,7 +13,7 @@ def register_user(*, username: str, email: str, password: str) -> User:
         username=username,
         email=email,
         password=password,
-        is_active=False, # Done  # TODO use email verification, set to False initially
+        is_active=False, 
     )
     return user
 
