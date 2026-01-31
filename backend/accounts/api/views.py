@@ -8,7 +8,7 @@ from rest_framework import status
 
 from accounts.api.serializers import RegisterSerializer, LogoutSerializer, CurrentUserSerializer, \
     ChangePasswordSerializer, UpdateProfileSerializer, CustomTokenObtainPairSerializer, \
-    ResetPasswordRequestSerializer, ResetPasswordConfirmSerializer
+    ResetPasswordRequestSerializer, ResetPasswordConfirmSerializer, CustomTokenRefreshSerializer
     
 from accounts.services.auth_service import register_user, logout_user, change_password, update_profile
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -20,13 +20,13 @@ from django.contrib.auth import get_user_model
 from rest_framework.exceptions import ValidationError
 
 
-from rest_framework_simplejwt.views import TokenObtainPairView
-
-
 # from accounts.services.email_service import send_verification_email
 from accounts.tasks import send_verification_email_task, send_password_reset_email_task
 
 from accounts.tokens import PasswordResetToken
+
+from accounts.jwt.decoder import decode_jwt
+from accounts.jwt.blacklist import blacklist_token
 
 
 
@@ -51,7 +51,7 @@ class RegisterView(APIView):
 #### Before verification with email
 
 # class RegisterView(APIView):
-#     permission_classes = [permissions.AllowAny]
+#     permission_classes = [AllowAny]
         
 #     def post(self, request):
 #         serializer = RegisterSerializer(data=request.data)
@@ -121,22 +121,55 @@ class VerifyEmailView(APIView):
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-class RefreshTokenView(TokenRefreshView):
-    pass
+# class RefreshTokenView(TokenRefreshView):
+#     pass
+
+class RefreshTokenView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = CustomTokenRefreshSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+
+
+
+# class LogoutView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request):
+#         serializer = LogoutSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         try:
+#             logout_user(refresh_token=serializer.validated_data["refresh"])
+#         except:
+#             pass
+
+#         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class LogoutView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        serializer = LogoutSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        try:
-            logout_user(refresh_token=serializer.validated_data["refresh"])
-        except:
-            pass
+        refresh = request.data.get("refresh")
+        if not refresh:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        payload = decode_jwt(refresh)
+
+        if payload["token_type"] != "refresh":
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        blacklist_token(payload["jti"])
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+
 
 
 

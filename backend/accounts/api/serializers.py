@@ -8,6 +8,14 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.exceptions import AuthenticationFailed
 
 from accounts.models import Profile
+from accounts.tokens import LoginToken, RefreshToken
+
+
+from accounts.jwt.decoder import decode_jwt
+from accounts.jwt.blacklist import is_blacklisted
+
+
+
 
 User = get_user_model()
 
@@ -111,12 +119,6 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
 
 
 
-
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework.exceptions import AuthenticationFailed
-from accounts.tokens import LoginToken
-
-
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
@@ -125,10 +127,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         if not self.user.is_active:
             raise AuthenticationFailed("Email is not verified")
 
-        # replace default access token
         access = LoginToken.for_user(self.user)
+        refresh = RefreshToken.for_user(self.user)
+
 
         data["access"] = str(access)
+        data["refresh"] = str(refresh)
 
         return data
 
@@ -140,6 +144,39 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 #             raise AuthenticationFailed("Email is not verified")
 
 #         return data
+
+
+class CustomTokenRefreshSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+
+    def validate(self, attrs):
+        payload = decode_jwt(attrs["refresh"])
+
+        if payload["token_type"] != "refresh":
+            raise serializers.ValidationError("Invalid token type")
+
+        if is_blacklisted(payload["jti"]):
+            raise serializers.ValidationError("Token is blacklisted")
+
+        user = User.objects.get(id=payload["user_id"])
+
+        access = LoginToken.for_user(
+            user,
+            extra={
+                "username": user.username,
+                "permissions": list(user.get_all_permissions()),
+            }
+        )
+
+        return {
+            "access": str(access),
+        }
+
+
+
+
+
+
 
 
 

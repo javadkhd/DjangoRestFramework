@@ -2,6 +2,8 @@ from rest_framework_simplejwt.tokens import Token, AccessToken
 from django.conf import settings
 
 
+from accounts.jwt.tokens import LoginToken as LT, RefreshToken as RT
+
 class EmailVerificationToken(Token):
     token_type = "email_verification"
     lifetime = settings.EMAIL_VERIFICATION_TOKEN_LIFETIME
@@ -13,7 +15,21 @@ class PasswordResetToken(Token):
 
 
 
-class LoginToken(AccessToken):
+# class LoginToken(AccessToken):
+#     @classmethod
+#     def for_user(cls, user):
+#         token = super().for_user(user)
+
+#         token["signature"] = "Asghar"
+#         token["username"] = user.username
+#         token["email"] = user.email
+#         token["permissions"] = list(
+#             user.get_all_permissions()
+#         )
+
+#         return token
+
+class LoginToken(LT):
     @classmethod
     def for_user(cls, user):
         token = super().for_user(user)
@@ -26,3 +42,7 @@ class LoginToken(AccessToken):
         )
 
         return token
+
+
+class RefreshToken(RT):
+    pass
