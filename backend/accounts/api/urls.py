@@ -3,14 +3,18 @@ from django.urls import path
 
 
 from accounts.api.views import RegisterView, VerifyEmailView, LoginView, RefreshTokenView, \
-    LogoutView, ChangePasswordView, UpdateProfileView, CurrentUserView
+    LogoutView, ChangePasswordView, UpdateProfileView, CurrentUserView, \
+    ResetPasswordRequestView, ResetPasswordConfirmView
 
 app_name = "accounts"
 
 urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),
     path("verify-email/", VerifyEmailView.as_view(), name="verify_email"),
-    path("change-password/", ChangePasswordView.as_view(), name="change_password"),
+    # path("change-password/", ChangePasswordView.as_view(), name="change_password"), # OLD View: Without email
+    path("reset-password/", ResetPasswordRequestView.as_view(), name="reset_password"),
+    path("reset-password/confirm/", ResetPasswordConfirmView.as_view(), name="reset_password_confirm",),
+    
     
     path("logout/", LogoutView.as_view(), name="logout"),
     path("token/", LoginView.as_view(), name="token_obtain"),
@@ -19,3 +23,7 @@ urlpatterns = [
     path("update-profile/", UpdateProfileView.as_view(), name="update_profile"),
     path("me/", CurrentUserView.as_view(), name="current_user"),
 ]
+
+
+
+

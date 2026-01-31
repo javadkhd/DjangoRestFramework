@@ -1,45 +1,71 @@
 
 ```
-project/
-├── backend/
-│   ├── config/
-│   │   ├── __init__.py
-│   │   ├── settings.py
-│   │   ├── celery.py
-│   │   ├── urls.py
-│   │   └── wsgi.py / asgi.py
-│   │
-│   ├── orders/
-│   │   ├── __init__.py
-│   │   ├── admin.py
-│   │   ├── apps.py
-│   │   ├── models.py
-│   │   ├── tasks.py
-│   │   ├── services/
-│   │   │   ├── __init__.py
-│   │   │   ├── order_service.py
-│   │   │   └── exceptions.py
-│   │   ├── api/
-│   │   │   ├── __init__.py
-│   │   │   ├── serializers.py
-│   │   │   ├── views.py
-│   │   │   └── urls.py
-│   │   └── migrations/
-│   │       └── ...
-│   │
-│   ├── manage.py
-│   ├── requirements.txt
-│   └── ...
-│
-├── docker/
-│   ├── backend/
-│   │   └── Dockerfile
-│   └── nginx/
-│       └── nginx.conf
-│
-├── .env
-├── Makefile
+├── backend
+│   ├── accounts
+│   │   ├── admin.py
+│   │   ├── api
+│   │   │   ├── __init__.py
+│   │   │   ├── serializers.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── apps.py
+│   │   ├── __init__.py
+│   │   ├── migrations
+│   │   │   ├── 0001_initial.py
+│   │   │   └── __init__.py
+│   │   ├── models.py
+│   │   ├── services
+│   │   │   ├── auth_service.py
+│   │   │   ├── email_service.py
+│   │   │   └── __init__.py
+│   │   ├── tests.py
+│   │   ├── tokens.py
+│   │   └── views.py
+│   ├── common
+│   │   ├── health.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── config
+│   │   ├── asgi.py
+│   │   ├── celery.py
+│   │   ├── __init__.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── Dockerfile
+│   ├── entrypoint.sh
+│   ├── manage.py
+│   ├── orders
+│   │   ├── admin.py
+│   │   ├── api
+│   │   │   ├── __init__.py
+│   │   │   ├── permissions.py
+│   │   │   ├── serializers.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── apps.py
+│   │   ├── __init__.py
+│   │   ├── migrations
+│   │   │   ├── 0001_initial.py
+│   │   │   └── __init__.py
+│   │   ├── models.py
+│   │   ├── services
+│   │   │   ├── cpu_processing.py
+│   │   │   ├── exceptions.py
+│   │   │   ├── __init__.py
+│   │   │   └── order_service.py
+│   │   ├── tasks.py
+│   │   ├── tests.py
+│   │   └── views.py
+│   ├── requirements.txt
+│   └── staticfiles
+│ 
+├── docker
+│   └── nginx
+│       ├── Dockerfile
+│       └── nginx.conf
 ├── docker-compose.yml
-├── .gitignore
+├── Makefile
 └── README.md
+
 ```

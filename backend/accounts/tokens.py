@@ -1,6 +1,12 @@
 from rest_framework_simplejwt.tokens import Token
-from datetime import timedelta
+from django.conf import settings
+
 
 class EmailVerificationToken(Token):
     token_type = "email_verification"
-    lifetime = timedelta(minutes=30) 
+    lifetime = settings.EMAIL_VERIFICATION_TOKEN_LIFETIME
+
+
+class PasswordResetToken(Token):
+    token_type = "password_reset"
+    lifetime = settings.PASSWORD_RESET_TOKEN_LIFETIME
