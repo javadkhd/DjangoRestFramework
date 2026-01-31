@@ -1,0 +1,35 @@
+# Normalize line endings
+* text=auto eol=lf
+
+# Treat Python and JavaScript files as text
+*.py text
+*.js text
+*.jsx text
+*.ts text
+*.tsx text
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+
+# Keep consistent behavior for docker configs
+Dockerfile text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+
+# Merge rules for lock files
+package-lock.json merge=union
+yarn.lock merge=union
+poetry.lock merge=union
+
+# Mark migrations as generated code (optional)
+**/migrations/*.py linguist-generated
