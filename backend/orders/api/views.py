@@ -11,12 +11,14 @@ from orders.services.exceptions import OrderNotFound
 
 from orders.api.permissions import IsOrderOwner
 
+from orders.api.pagination import OrderCursorPagination
 
 
 class OrderListView(ListAPIView):
     serializer_class = OrderDetailSerializer
     permission_classes = [IsAuthenticated, IsOrderOwner]
-
+    pagination_class = OrderCursorPagination
+    
     def get_queryset(self):
         return filter_order(user=self.request.user)
 
